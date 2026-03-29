@@ -61,3 +61,43 @@ class WordAnalyzer:
         for word in sorted_words:
             print(f"{word}: {self.__frequencies[word]}")
         print("-" * 30)
+def main() -> None:
+    # Dictionary of 4 file paths built using pathlib
+    files_dict: Dict[str, Path] = {
+        "1": Path("monte_cristo.txt"),
+        "2": Path("treasure_island.txt"),
+        "3": Path("Tarzan.txt"),
+        "4": Path("princess_mars.txt")
+    }
+
+    #  list of "stop words"
+    common_stop_words: List[str] = ["the", "a", "an", "and", "or", "but", "in", "on", "at", "to"]
+
+    while True:
+        print("\n--- Word Count Menu ---")
+        for key, path in files_dict.items():
+            # Display name without extension
+            print(f"{key}. {path.stem}")
+        print("5. Exit")
+
+        choice: str = input("\nSelect a file (1-5): ").strip()
+
+        if choice == "5":
+            print("Goodbye!")
+            break
+        
+        if choice in files_dict:
+            selected_path: Path = files_dict[choice]
+            # Create instance of WordAnalyzer
+            analyzer = WordAnalyzer(str(selected_path), stop_words=common_stop_words)
+            
+            # Execute processing and report printing
+            if analyzer.process_file():
+                analyzer.print_report()
+            else:
+                print(f"Error: Could not process '{selected_path}'. Please check if the file exists.")
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
