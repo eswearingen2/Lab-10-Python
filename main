@@ -1,0 +1,63 @@
+"""
+Word Count
+Ethan Swearingen,
+Counts number of words in txt file,
+03/29/2025
+"""
+
+import string
+from pathlib import Path
+from typing import Dict, List, Optional, Set
+
+class WordAnalyzer:
+    def __init__(self, filepath: str, stop_words: Optional[List[str]] = None) -> None:
+        """
+        Initializes the WordAnalyzer with a file path and optional stop words.
+        """
+        # Store as private Path object
+        self.__filepath: Path = Path(filepath)
+        # Private dictionary for word frequencies
+        self.__frequencies: Dict[str, int] = {}
+        # Optional stop words (Challenge) stored as a set for faster lookups
+        self.__stop_words: Set[str] = set(stop_words) if stop_words else set()
+
+    def process_file(self) -> bool:
+        """
+        Reads and analyzes the file, updating word counts. 
+        Returns True if successful, False if file not found.
+        """
+        try:
+            if not self.__filepath.exists():
+                return False
+            
+            # Create translation table to strip punctuation efficiently
+            translator = str.maketrans('', '', string.punctuation)
+            
+            with self.__filepath.open('r', encoding='utf-8') as file:
+                for line in file:
+                    # Clean line: convert to lowercase and remove punctuation
+                    clean_line: str = line.lower().translate(translator)
+                    words: List[str] = clean_line.split()
+                    
+                    for word in words:
+                        if word not in self.__stop_words:
+                            self.__frequencies[word] = self.__frequencies.get(word, 0) + 1
+            return True
+            
+        except FileNotFoundError:
+            return False
+
+    def print_report(self) -> None:
+        """
+        Prints an alphabetical list of word frequencies.
+        """
+        if not self.__frequencies:
+            print("No words found to report.")
+            return
+
+        print(f"\n--- Word Count Report: {self.__filepath.name} ---")
+        # Get keys and sort them alphabetically
+        sorted_words: List[str] = sorted(self.__frequencies.keys())
+        for word in sorted_words:
+            print(f"{word}: {self.__frequencies[word]}")
+        print("-" * 30)
